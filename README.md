@@ -1,130 +1,158 @@
 # VoIP Analysis with Machine Learning
 
-This project focuses on analyzing Voice over IP (VoIP) communications using machine learning techniques. It integrates external tools like Xplico and VoIPShark for comprehensive analysis.
-
-## Project Structure
-
-
-Certainly! Below are the `requirements.txt` and `README.md` files for your VoIP analysis application.
-
-### `requirements.txt`
-
-This file lists the Python dependencies required for your project:
-
-```
-scapy
-numpy
-scikit-learn
-joblib
-```
-
-**Note:** Ensure that Xplico and VoIPShark are installed on your system, as they are external tools not available via Python's package manager.
-
-### `README.md`
-
-This file provides an overview and instructions for your project:
-
-```markdown
-# VoIP Analysis with Machine Learning
-
-This project focuses on analyzing Voice over IP (VoIP) communications using machine learning techniques. It integrates external tools like Xplico and VoIPShark for comprehensive analysis.
+This project provides a web-based interface for analyzing Voice over IP (VoIP) communications using machine learning techniques. It includes functionality for analyzing PCAP files and training ML models for VoIP quality assessment.
 
 ## Project Structure
 
 ```
 voip_analysis_ml/
-├── data_processing/
+├── app.py                  # Main Flask application
+├── requirements.txt        # Project dependencies
+├── uploads/               # Directory for temporary file uploads
+├── static/                # Static files for web interface
+│   ├── css/
+│   │   └── style.css
+│   └── js/
+│       └── main.js
+├── templates/             # Flask HTML templates
+│   ├── base.html         # Base template with common layout
+│   ├── index.html        # Home page with upload forms
+│   └── results.html      # Analysis results page
+├── data_processing/       # Data processing modules
 │   ├── __init__.py
 │   ├── pcap_processor.py
-│   ├── xplico_interface.py
 │   └── voipshark_interface.py
-├── ml_models/
+├── ml_models/            # Machine learning modules
 │   ├── __init__.py
+│   ├── advanced_metrics.py
 │   ├── feature_extraction.py
 │   ├── model.py
+│   ├── traffic_analyzer.py
 │   └── train.py
-├── utils/
+├── utils/                # Utility modules
 │   ├── __init__.py
-│   ├── logger.py
-│   └── config.py
-├── main.py
-├── requirements.txt
-└── README.md
+│   ├── config.py
+│   └── logger.py
+└── models/              # Directory to store trained models
+    └── voip_quality_model.pkl
+```
+
+## Prerequisites
+
+- Python 3.8 or higher
+- Flask
+- Scapy
+- NumPy
+- scikit-learn
+- Other dependencies listed in requirements.txt
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/voip_analysis_ml.git
+cd voip_analysis_ml
+```
+
+2. Create and activate a virtual environment:
+```bash
+# Create virtual environment
+python -m venv venv
+
+# Activate it
+# On Windows:
+venv\Scripts\activate
+# On Unix or MacOS:
+source venv/bin/activate
+```
+
+3. Install the required packages:
+```bash
+pip install -r requirements.txt
+```
+
+4. Create necessary directories:
+```bash
+mkdir -p uploads static/{css,js} templates models
+```
+
+5. Configure the application:
+- Edit `utils/config.py` to set your desired paths
+- Ensure the directories specified in config.py exist and are writable
+
+## Running the Application
+
+Go to the folder the app.py file is and execute it with $ python3 app.py
+
+1. Start the Flask application:
+```bash
+# Development mode
+export FLASK_ENV=development
+flask run
+
+# Production mode
+export FLASK_ENV=production
+flask run --host=0.0.0.0
 ```
 
 
 
-To run and utilize your VoIP analysis application, follow these steps:
+2. Access the web interface:
+- Open your web browser and navigate to `http://localhost:5000`
+- Use the "Analyze PCAP" form to analyze VoIP PCAP files
+- Use the "Train Model" form to upload training data
 
-### 1. Prerequisites
+## Features
 
-- **Python 3.x**: Ensure Python is installed on your system.
-- **Xplico**: An open-source network forensic analysis tool.
-- **VoIPShark**: A VoIP analysis platform.
+- Web-based interface for VoIP analysis
+- PCAP file upload and analysis
+- Real-time visualization of analysis results
+- Machine learning model training interface
+- Comprehensive VoIP quality metrics including:
+  - Mean Opinion Score (MOS)
+  - Jitter analysis
+  - Packet loss detection
+  - Call flow analysis
+  - Traffic pattern analysis
 
-### 2. Installation Steps
+## Analysis Results
 
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/yourusername/voip_analysis_ml.git
-   cd voip_analysis_ml
-   ```
+The application provides:
+- Basic call statistics
+- Quality metrics (MOS, jitter, packet loss)
+- Traffic pattern analysis
+- Protocol distribution
+- Anomaly detection
+- Interactive visualizations
 
-2. **Set Up a Virtual Environment**:
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate  # On Windows, use venv\Scripts\activate
-   ```
+## Development
 
-3. **Install Python Dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
+To contribute to this project:
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
 
-4. **Install External Tools**:
-   - **Xplico**: Follow the [official installation guide](https://www.xplico.org/installation).
-   - **VoIPShark**: Clone and install from the [GitHub repository](https://github.com/pentesteracademy/voipshark).
+## Troubleshooting
 
-5. **Configure Paths**:
-   Edit `utils/config.py` to specify the paths to the Xplico and VoIPShark executables:
-   ```python
-   class Config:
-       XPLICO_PATH = '/path/to/xplico'
-       VOIPSHARK_PATH = '/path/to/voipshark'
-       DATA_DIR = '/path/to/data'
-       OUTPUT_DIR = '/path/to/output'
-   ```
-   Replace `/path/to/xplico` and `/path/to/voipshark` with the actual installation paths on your system.
+Common issues and solutions:
+- If you get permission errors, check directory permissions
+- For import errors, verify your PYTHONPATH includes the project root
+- For Flask errors, check the console output for detailed error messages
 
-### 3. Running the Application
+## Security Notes
 
-1. **Prepare Your PCAP File**:
-   Place the PCAP file you wish to analyze in the directory specified by `DATA_DIR` in `config.py`.
+For production deployment:
+- Change debug mode to False
+- Use a proper WSGI server
+- Set up proper security measures
+- Configure comprehensive logging
+- Use environment variables for sensitive configuration
 
-2. **Execute the Main Script**:
-   Run the application by specifying the path to your PCAP file:
-   ```bash
-   python main.py /path/to/yourfile.pcap
-   ```
-   The application will process the PCAP file, perform VoIP analysis using Xplico and VoIPShark, extract features, and apply the machine learning model to assess call quality.
+## License
 
-### 4. Training the Machine Learning Model (Optional)
+[Your chosen license]
 
-If you have labeled data and wish to train the machine learning model:
+## Contact
 
-1. **Prepare Labeled Data**:
-   Ensure your data is organized appropriately for training.
-
-2. **Run the Training Script**:
-   ```bash
-   python ml_models/train.py
-   ```
-   This script will train the model and save it for future analyses.
-
-### 5. Viewing Results
-
-After running the analysis, results will be stored in the directory specified by `OUTPUT_DIR` in `config.py`. Review the output files to assess the analyzed VoIP call quality and other relevant metrics.
-
-**Note**: Ensure that all paths in `config.py` are correctly set to match your system's configuration. Additionally, verify that Xplico and VoIPShark are properly installed and accessible from the command line.
-
-By following these steps, you can effectively run and utilize your VoIP analysis application to assess and analyze VoIP communications using integrated machine learning techniques. 
+[Your contact information]
