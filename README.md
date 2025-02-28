@@ -1,6 +1,6 @@
 # VoIP Analysis with Machine Learning
 
-This project provides a web-based interface for analyzing Voice over IP (VoIP) communications using machine learning techniques. It includes functionality for analyzing PCAP files and training ML models for VoIP quality assessment.
+This project provides a web-based interface for analyzing VoIP communications using machine learning techniques. It includes functionality for analyzing PCAP files and training ML models for VoIP quality assessment.
 
 ## Project Structure
 
@@ -50,14 +50,14 @@ voip_analysis_ml/
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/voip_analysis_ml.git
+git clone https://github.com/gpscal/voip_analysis_ml.git
 cd voip_analysis_ml
 ```
 
 2. Create and activate a virtual environment:
 ```bash
 # Create virtual environment
-python -m venv venv
+python3 -m venv venv
 
 # Activate it
 # On Windows:
@@ -82,9 +82,9 @@ mkdir -p uploads static/{css,js} templates models
 
 ## Running the Application
 
-Go to the folder the app.py file is and execute it with $ python3 app.py
+Option 1 = Go to the folder where the app.py file is and execute it using the command $ python3 app.py
 
-1. Start the Flask application:
+Option 2 = Start the Flask application:
 ```bash
 # Development mode
 export FLASK_ENV=development
@@ -149,10 +149,3 @@ For production deployment:
 - Configure comprehensive logging
 - Use environment variables for sensitive configuration
 
-## License
-
-[Your chosen license]
-
-## Contact
-
-[Your contact information]
