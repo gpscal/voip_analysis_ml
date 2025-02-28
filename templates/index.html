@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Analyze PCAP</h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('analyze') }}" method="post" enctype="multipart/form-data" id="analyzeForm">
+                    <div class="upload-area mb-3" id="analyzeDropZone">
+                        <p class="mb-3">Drag and drop your PCAP file here or</p>
+                        <input type="file" class="form-control" id="analyzeFile" name="file" accept=".pcap,.pcapng" style="display: none;">
+                        <button type="button" class="btn btn-primary" onclick="document.getElementById('analyzeFile').click()">
+                            Select File
+                        </button>
+                        <p class="selected-file mt-2 small text-muted"></p>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Analyze PCAP</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Train Model</h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('train') }}" method="post" enctype="multipart/form-data" id="trainForm">
+                    <div class="upload-area mb-3" id="trainDropZone">
+                        <p class="mb-3">Drag and drop your training PCAP file here or</p>
+                        <input type="file" class="form-control" id="trainFile" name="file" accept=".pcap,.pcapng" style="display: none;">
+                        <button type="button" class="btn btn-primary" onclick="document.getElementById('trainFile').click()">
+                            Select File
+                        </button>
+                        <p class="selected-file mt-2 small text-muted"></p>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Train Model</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function setupDropZone(dropZoneId, fileInputId) {
+    const dropZone = document.getElementById(dropZoneId);
+    const fileInput = document.getElementById(fileInputId);
+    const selectedFile = dropZone.querySelector('.selected-file');
+
+    // Handle drag and drop events
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+    });
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+            dropZone.classList.add('drag-over');
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+            dropZone.classList.remove('drag-over');
+        });
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        const file = e.dataTransfer.files[0];
+        if (file && file.name.match(/\.(pcap|pcapng)$/)) {
+            fileInput.files = e.dataTransfer.files;
+            selectedFile.textContent = `Selected: ${file.name}`;
+        }
+    });
+
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+            selectedFile.textContent = `Selected: ${fileInput.files[0].name}`;
+        }
+    });
+}
+
+// Setup both drop zones
+setupDropZone('analyzeDropZone', 'analyzeFile');
+setupDropZone('trainDropZone', 'trainFile');
+</script>
+{% endblock %}
