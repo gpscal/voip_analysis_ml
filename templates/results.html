@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Analysis Results</h5>
+                <a href="{{ url_for('index') }}" class="btn btn-primary">Analyze Another File</a>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Call Statistics -->
+                    <div class="col-md-6 mb-4">
+                        <h6 class="border-bottom pb-2">Call Statistics</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <tbody>
+                                    <tr>
+                                        <th>Duration</th>
+                                        <td>{{ "%.2f"|format(call_data.duration) }} seconds</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Total Packets</th>
+                                        <td>{{ call_data.packet_count }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>SIP Packets</th>
+                                        <td>{{ call_data.sip_count }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>RTP Packets</th>
+                                        <td>{{ call_data.rtp_count }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Quality Metrics -->
+                    <div class="col-md-6 mb-4">
+                        <h6 class="border-bottom pb-2">Quality Metrics</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <tbody>
+                                    <tr>
+                                        <th>MOS Score</th>
+                                        <td class="quality-indicator {{ 'quality-good' if qos_report.quality_metrics.mos >= 3.5 else 'quality-poor' }}">
+                                            {{ "%.2f"|format(qos_report.quality_metrics.mos) }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Jitter</th>
+                                        <td>{{ "%.2f"|format(qos_report.quality_metrics.jitter) }} ms</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Packet Loss Rate</th>
+                                        <td>{{ "%.2f"|format(qos_report.quality_metrics.packet_loss_rate * 100) }}%</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Setup Time</th>
+                                        <td>{{ "%.3f"|format(qos_report.quality_metrics.setup_time) }} s</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Timing Analysis Chart -->
+                    <div class="col-12 mb-4">
+                        <h6 class="border-bottom pb-2">Timing Analysis</h6>
+                        <canvas id="timingChart" height="200"></canvas>
+                    </div>
+
+                    <!-- Protocol Distribution -->
+                    <div class="col-md-6 mb-4">
+                        <h6 class="border-bottom pb-2">Protocol Distribution</h6>
+                        <canvas id="protocolChart" height="200"></canvas>
+                    </div>
+
+                    <!-- Packet Size Distribution -->
+                    <div class="col-md-6 mb-4">
+                        <h6 class="border-bottom pb-2">Packet Size Distribution</h6>
+                        <canvas id="packetSizeChart" height="200"></canvas>
+                    </div>
+
+                    <!-- Anomalies -->
+                    {% if qos_report.anomalies %}
+                    <div class="col-12">
+                        <div class="alert alert-warning">
+                            <h6 class="alert-heading">Detected Anomalies</h6>
+                            <ul class="mb-0">
+                                {% for anomaly in qos_report.anomalies %}
+                                <li>{{ anomaly }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Timing Analysis Chart
+const timingCtx = document.getElementById('timingChart').getContext('2d');
+new Chart(timingCtx, {
+    type: 'line',
+    data: {
+        labels: ['0%', '25%', '50%', '75%', '100%'],
+        datasets: [{
+            label: 'Inter-arrival Time (ms)',
+            data: [
+                0,
+                {{ traffic_behavior.timing_analysis.timing_percentiles['25'] * 1000 }},
+                {{ traffic_behavior.timing_analysis.timing_percentiles['50'] * 1000 }},
+                {{ traffic_behavior.timing_analysis.timing_percentiles['75'] * 1000 }},
+                {{ traffic_behavior.timing_analysis.mean_inter_arrival * 1000 }}
+            ],
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            title: {
+                display: true,
+                text: 'Packet Inter-arrival Time Distribution'
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                title: {
+                    display: true,
+                    text: 'Milliseconds'
+                }
+            }
+        }
+    }
+});
+
+// Protocol Distribution Chart
+const protocolCtx = document.getElementById('protocolChart').getContext('2d');
+new Chart(protocolCtx, {
+    type: 'pie',
+    data: {
+        labels: Object.keys({{ traffic_behavior.protocol_distribution.protocol_counts|tojson }}),
+        datasets: [{
+            data: Object.values({{ traffic_behavior.protocol_distribution.protocol_counts|tojson }}),
+            backgroundColor: [
+                'rgb(255, 99, 132)',
+                'rgb(54, 162, 235)',
+                'rgb(255, 205, 86)'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            title: {
+                display: true,
+                text: 'Protocol Distribution'
+            }
+        }
+    }
+});
+
+// Packet Size Distribution Chart
+const packetSizeCtx = document.getElementById('packetSizeChart').getContext('2d');
+new Chart(packetSizeCtx, {
+    type: 'bar',
+    data: {
+        labels: ['25th', '50th', '75th', 'Mean'],
+        datasets: [{
+            label: 'Packet Size (bytes)',
+            data: [
+                {{ traffic_behavior.size_distribution.percentiles['25'] }},
+                {{ traffic_behavior.size_distribution.percentiles['50'] }},
+                {{ traffic_behavior.size_distribution.percentiles['75'] }},
+                {{ traffic_behavior.size_distribution.mean }}
+            ],
+            backgroundColor: 'rgb(75, 192, 192)'
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            title: {
+                display: true,
+                text: 'Packet Size Distribution'
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                title: {
+                    display: true,
+                    text: 'Bytes'
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
