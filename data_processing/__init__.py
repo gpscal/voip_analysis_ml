@@ -7,8 +7,7 @@ like Xplico and VoIPShark.
 """
 
 from .pcap_processor import extract_packets, filter_voip_packets
-from .xplico_interface import run_xplico
-from .voipshark_interface import run_voipshark
+
 
 __all__ = [
     'extract_packets',
