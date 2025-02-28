@@ -73,19 +73,9 @@ pip install -r requirements.txt
 
 ## Running the Application
 
-Option 1 = Go to the folder where the app.py file is and execute it using the command $ python3 app.py
+Run app.py file with command $ python3 app.py
 
-Option 2 = Start the Flask application:
-```bash
-# Development mode
-export FLASK_ENV=development
-flask run
-
-# Production mode
-export FLASK_ENV=production
-flask run --host=0.0.0.0
-```
-After following option 1 or 2, then acess the web interface:
+Acess the web interface:
 - Open your web browser and navigate to `http://localhost:5000`
 - Use the "Analyze PCAP" form to analyze VoIP PCAP files
 - Use the "Train Model" form to upload training data
