@@ -71,15 +71,6 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-4. Create necessary directories:
-```bash
-mkdir -p uploads static/{css,js} templates models
-```
-
-5. Configure the application:
-- Edit `utils/config.py` to set your desired paths
-- Ensure the directories specified in config.py exist and are writable
-
 ## Running the Application
 
 Option 1 = Go to the folder where the app.py file is and execute it using the command $ python3 app.py
