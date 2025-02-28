@@ -9,7 +9,7 @@ voip_analysis_ml/
 ├── app.py                  # Main Flask application
 ├── requirements.txt        # Project dependencies
 ├── uploads/               # Directory for temporary file uploads
-├── static/                # Static files for web interface
+├── static/                # Static files for web interface (Not required)
 │   ├── css/
 │   │   └── style.css
 │   └── js/
@@ -39,7 +39,7 @@ voip_analysis_ml/
 
 ## Prerequisites
 
-- Python 3.8 or higher
+- Python3
 - Flask
 - Scapy
 - NumPy
@@ -94,10 +94,7 @@ flask run
 export FLASK_ENV=production
 flask run --host=0.0.0.0
 ```
-
-
-
-2. Access the web interface:
+After following option 1 or 2, then acess the web interface:
 - Open your web browser and navigate to `http://localhost:5000`
 - Use the "Analyze PCAP" form to analyze VoIP PCAP files
 - Use the "Train Model" form to upload training data
