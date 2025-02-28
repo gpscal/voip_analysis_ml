@@ -15,9 +15,16 @@
                         <button type="button" class="btn btn-primary" onclick="document.getElementById('analyzeFile').click()">
                             Select File
                         </button>
-                        <p class="selected-file mt-2 small text-muted"></p>
+                        <p class="selected-file mt-2 small text-primary fw-bold"></p>
                     </div>
-                    <button type="submit" class="btn btn-success w-100">Analyze PCAP</button>
+                    <button type="submit" class="btn btn-success w-100" id="analyzeButton">Analyze PCAP</button>
+                    <div class="loading-spinner mt-3 text-center" id="analyzeSpinner" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Analyzing PCAP file, please wait...</p>
+                        <p class="file-info text-muted"></p>
+                    </div>
                 </form>
             </div>
         </div>
@@ -36,9 +43,16 @@
                         <button type="button" class="btn btn-primary" onclick="document.getElementById('trainFile').click()">
                             Select File
                         </button>
-                        <p class="selected-file mt-2 small text-muted"></p>
+                        <p class="selected-file mt-2 small text-primary fw-bold"></p>
                     </div>
-                    <button type="submit" class="btn btn-success w-100">Train Model</button>
+                    <button type="submit" class="btn btn-success w-100" id="trainButton">Train Model</button>
+                    <div class="loading-spinner mt-3 text-center" id="trainSpinner" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Training model, please wait...</p>
+                        <p class="file-info text-muted"></p>
+                    </div>
                 </form>
             </div>
         </div>
@@ -78,18 +92,78 @@ function setupDropZone(dropZoneId, fileInputId) {
         if (file && file.name.match(/\.(pcap|pcapng)$/)) {
             fileInput.files = e.dataTransfer.files;
             selectedFile.textContent = `Selected: ${file.name}`;
+            // Also store file info for later display
+            dropZone.setAttribute('data-filename', file.name);
+            dropZone.setAttribute('data-filesize', formatFileSize(file.size));
         }
     });
 
     fileInput.addEventListener('change', () => {
         if (fileInput.files.length > 0) {
-            selectedFile.textContent = `Selected: ${fileInput.files[0].name}`;
+            const file = fileInput.files[0];
+            selectedFile.textContent = `Selected: ${file.name}`;
+            // Also store file info for later display
+            dropZone.setAttribute('data-filename', file.name);
+            dropZone.setAttribute('data-filesize', formatFileSize(file.size));
         }
     });
+}
+
+function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' bytes';
+    else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    else return (bytes / 1048576).toFixed(1) + ' MB';
 }
 
 // Setup both drop zones
 setupDropZone('analyzeDropZone', 'analyzeFile');
 setupDropZone('trainDropZone', 'trainFile');
+
+// Form submission with loading indicators
+document.getElementById('analyzeForm').addEventListener('submit', function(e) {
+    // Validate file is selected
+    const fileInput = document.getElementById('analyzeFile');
+    if (fileInput.files.length === 0) {
+        e.preventDefault();
+        alert('Please select a PCAP file first');
+        return;
+    }
+    
+    // Show loading spinner
+    const dropZone = document.getElementById('analyzeDropZone');
+    const spinner = document.getElementById('analyzeSpinner');
+    const fileInfo = spinner.querySelector('.file-info');
+    
+    document.getElementById('analyzeButton').disabled = true;
+    spinner.style.display = 'block';
+    
+    // Display file info in the spinner
+    const filename = dropZone.getAttribute('data-filename');
+    const filesize = dropZone.getAttribute('data-filesize');
+    fileInfo.textContent = `Processing: ${filename} (${filesize})`;
+});
+
+document.getElementById('trainForm').addEventListener('submit', function(e) {
+    // Validate file is selected
+    const fileInput = document.getElementById('trainFile');
+    if (fileInput.files.length === 0) {
+        e.preventDefault();
+        alert('Please select a PCAP file first');
+        return;
+    }
+    
+    // Show loading spinner
+    const dropZone = document.getElementById('trainDropZone');
+    const spinner = document.getElementById('trainSpinner');
+    const fileInfo = spinner.querySelector('.file-info');
+    
+    document.getElementById('trainButton').disabled = true;
+    spinner.style.display = 'block';
+    
+    // Display file info in the spinner
+    const filename = dropZone.getAttribute('data-filename');
+    const filesize = dropZone.getAttribute('data-filesize');
+    fileInfo.textContent = `Processing: ${filename} (${filesize})`;
+});
 </script>
 {% endblock %}
