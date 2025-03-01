@@ -21,7 +21,6 @@ voip_analysis_ml/
 ├── data_processing/       # Data processing modules
 │   ├── __init__.py
 │   ├── pcap_processor.py
-│   └── voipshark_interface.py
 ├── ml_models/            # Machine learning modules
 │   ├── __init__.py
 │   ├── advanced_metrics.py
