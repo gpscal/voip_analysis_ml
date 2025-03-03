@@ -9,11 +9,6 @@ voip_analysis_ml/
 ├── app.py                  # Main Flask application
 ├── requirements.txt        # Project dependencies
 ├── uploads/               # Directory for temporary file uploads
-├── static/                # Static files for web interface (Not required)
-│   ├── css/
-│   │   └── style.css
-│   └── js/
-│       └── main.js
 ├── templates/             # Flask HTML templates
 │   ├── base.html         # Base template with common layout
 │   ├── index.html        # Home page with upload forms
